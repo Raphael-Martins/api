@@ -1,11 +1,28 @@
 const express = require('express'); // importa o express
 
 const routes = require('./routes'); //por padrao, quando nao digo qual arquivo quero da pasta, ele carrega o "index", por isso mantenho o "index.js" dentro de "routes" com esse nome
+const AppError = require('./utils/AppError');
 
 const app = express(); // executa o express
 app.use(express.json()); // indica ao express que ira receber os request no formato jason
 
 app.use(routes); // quando a requisicao for enviada, do lado do cliente, ela caira aqui, e aqui o express "app" manda usar o "routes", que e meu "index.js" la dentro da pasta "routes", chegando la, ele vai ver qual e a rota solicitada, como "/user" por exemplo, e quando ele pegar a rota, vai redirecionar la, pro js que ta setado, no caso de "/user", seria "user.routes.js"
+
+app.use((error, request, response, next) => {
+  if (error instanceof AppError) {
+    return response.status(error.statusCode).json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+
+  console.error(error);
+
+  return response.status(500).json({
+    status: 'error',
+    message: 'internal server error',
+  });
+});
 
 const PORT = 3333;
 app.listen(PORT, () => console.log(`server is running on Port ${PORT}`));

@@ -1,6 +1,13 @@
+const AppError = require("../utils/AppError")
+
 class UserController {
   create( request, response) {
     const { name, email, password } = request.body; // desestruturando os dados de dentro do corpo do request
+
+
+    if(!name) {
+      throw new AppError("nome e obrigatorio")
+    }
 
     response.status(201).json({ name, email, password }); // respondendo como um objeto tambem em jason, aproveitandoe ja enviando o status code . no caso usei de create
   }
